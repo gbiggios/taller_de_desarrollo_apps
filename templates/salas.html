@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salas</title>
+</head>
+<body>
+    <h1>Listado de Salas</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Nombre Sala</th>
+            <th>Acciones</th>
+        </tr>
+        {% for sala in salas %}
+            <tr>                
+                <td>{{ sala.id_sala }}</td>
+                <td>{{ sala.nombre_sala }}</td>
+                <td><form action="{{ url_for('edit_sala', id_sala=sala.id_sala) }}" method="post" style="display: inline;">
+                    <button type="submit">Editar</button>
+                </form> 
+                <form action="{{ url_for('delete_sala', id_sala=sala.id_sala) }}" method="post" style="display: inline;">
+                    <button type="submit">Eliminar</button>
+                </form></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Agregar Nueva Sala</h2>
+    <form action="{{ url_for('create_sala') }}" method="post">
+        <label for="nombre_sala">Nombre de la Sala:</label>
+        <input type="text" id="nombre_sala" name="nombre_sala" required>
+        <button type="submit">Agregar Sala</button>
+    </form>
+</body>
+</html>

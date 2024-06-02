@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Talleres</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Lista de Talleres</h1>
+        <a href="/taller/new" class="btn btn-primary mb-3">Crear Nuevo Taller</a>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Horario</th>
+                    <th>Sala</th>
+                    <th>Docente</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for taller in talleres %}
+                <tr>
+                    <td>{{ taller.taller_id }}</td>
+                    <td>{{ taller.nombre }}</td>
+                    <td>{{ taller.horario }}</td>
+                    <td>{{ taller.sala.nombre_sala }}</td>
+                    <td>{{ taller.docente.nombre }} {{ taller.docente.apellido_paterno }}</td>
+                    <td>
+                        <a href="/taller/{{ taller.taller_id }}/edit" class="btn btn-warning">Editar</a>
+                        <form action="/taller/{{ taller.taller_id }}/delete" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

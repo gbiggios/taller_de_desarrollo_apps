@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Docentes</title>
+</head>
+<body>
+    <h1>Gestión de Docentes</h1>
+    <form action="/docente" method="POST">
+        <label for="rut_docente">RUT:</label>
+        <input type="text" id="rut_docente" name="rut_docente" required><br>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+        <label for="apellido_paterno">Apellido Paterno:</label>
+        <input type="text" id="apellido_paterno" name="apellido_paterno" required><br>
+        <label for="apellido_materno">Apellido Materno:</label>
+        <input type="text" id="apellido_materno" name="apellido_materno" required><br>
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" name="telefono"><br>
+        <label for="correo">Correo:</label>
+        <input type="email" id="correo" name="correo"><br>
+        <label for="contraseña">Contraseña:</label>
+        <input type="password" id="contraseña" name="contraseña"><br>
+        <input type="submit" value="Agregar Docente">
+    </form>
+    <h2>Lista de Docentes</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>RUT</th>
+            <th>Nombre</th>
+            <th>Apellido Paterno</th>
+            <th>Apellido Materno</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
+            <th>Acciones</th>
+        </tr>
+        {% for docente in docentes %}
+        <tr>
+            <td>{{ docente.id_docente }}</td>
+            <td>{{ docente.rut_docente }}</td>
+            <td>{{ docente.nombre }}</td>
+            <td>{{ docente.apellido_paterno }}</td>
+            <td>{{ docente.apellido_materno }}</td>
+            <td>{{ docente.telefono }}</td>
+            <td>{{ docente.correo }}</td>
+            <td>
+                <form action="/docente/{{ docente.id_docente }}/delete" method="POST" style="display:inline;">
+                    <input type="submit" value="Eliminar">
+                </form>
+                <a href="/docente/{{ docente.id_docente }}/edit">Editar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

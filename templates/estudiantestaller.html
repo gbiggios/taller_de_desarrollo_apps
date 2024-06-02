@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Estudiantes en Talleres</title>
+</head>
+<body>
+    <h1>Lista de Estudiantes en Talleres</h1>
+
+    <!-- Menú desplegable para seleccionar el taller -->
+    <form action="/estudiantetaller" method="post">
+        <label for="taller_id">Seleccione un taller:</label>
+        <select id="taller_id" name="taller_id">
+            {% for taller in talleres %}
+                <option value="{{ taller.taller_id }}">{{ taller.nombre }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Mostrar inscritos</button>
+    </form>
+
+    <!-- Tabla para mostrar los inscritos en el taller seleccionado -->
+    <h2>Inscritos en el Taller</h2>
+    <table id="tabla_inscritos">
+        <thead>
+            <tr>
+                <th>ID Estudiante</th>
+                <th>Nombre Estudiante</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se mostrarán dinámicamente los inscritos -->
+        </tbody>
+    </table>
+
+    <script>
+        // Función para cargar los inscritos del taller seleccionado
+        function mostrarInscritos() {
+            // Obtener el ID del taller seleccionado
+            var idTaller = document.getElementById("taller_id").value;
+
+            // Realizar una solicitud al servidor para obtener los inscritos del taller seleccionado
+            fetch('/inscritos_por_taller/' + idTaller)
+                .then(response => response.json())
+                .then(data => {
+                    // Limpiar la tabla
+                    var tbody = document.getElementById("tabla_inscritos").getElementsByTagName("tbody")[0];
+                    tbody.innerHTML = '';
+
+                    // Agregar los inscritos a la tabla
+                    data.forEach(inscrito => {
+                        var row = tbody.insertRow();
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        cell1.innerHTML = inscrito.id_estudiante;
+                        cell2.innerHTML = inscrito.nombre_estudiante;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar los inscritos:', error);
+                });
+        }
+
+        // Mostrar los inscritos del taller seleccionado al cargar la página
+        mostrarInscritos();
+    </script>
+</body>
+</html>

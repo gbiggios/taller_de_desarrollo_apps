@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Clases</title>
+</head>
+<body>
+    <h1>Lista de Clases</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Taller ID</th>
+                <th>Fecha</th>
+                <th>Comentario Bitácora</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for clase in clases %}
+            <tr>
+                <td>{{ clase.id }}</td>
+                <td>{{ clase.taller_id }}</td>
+                <td>{{ clase.fecha }}</td>
+                <td>{{ clase.comentario_bitacora }}</td>
+                <td>
+                    <form action="/clase/{{ clase.id }}/delete" method="post">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                    <a href="/clase/{{ clase.id }}/edit">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Agregar Nueva Clase</h2>
+    <form action="/clase" method="post">
+        <label for="taller_id">Taller ID:</label>
+        <input type="text" id="taller_id" name="taller_id" required><br>
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" name="fecha" required><br>
+        <label for="comentario_bitacora">Comentario Bitácora:</label><br>
+        <textarea id="comentario_bitacora" name="comentario_bitacora"></textarea><br>
+        <button type="submit">Agregar</button>
+    </form>
+</body>
+</html>
