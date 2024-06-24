@@ -1,11 +1,10 @@
 from flask import Flask, abort, request, jsonify, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 from sqlalchemy import inspect
 from werkzeug.utils import secure_filename
 import os
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 
 app = Flask(__name__)
 # Configuración de la base de datos MySQL
@@ -19,23 +18,9 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
 db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-# Modelo de Usuario
-class User(UserMixin, db.Model):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 # Modelo DOCENTE
-class DOCENTE(UserMixin, db.Model):
+class DOCENTE(db.Model):
     id_docente = db.Column(db.Integer, primary_key=True)
     rut_docente = db.Column(db.String(20), unique=True, nullable=False)
     nombre = db.Column(db.String(50), nullable=False)
@@ -43,7 +28,7 @@ class DOCENTE(UserMixin, db.Model):
     apellido_materno = db.Column(db.String(50), nullable=False)
     telefono = db.Column(db.String(20))
     correo = db.Column(db.String(100))
-    contraseña = db.Column(db.String(150))  # Asegúrate de almacenar contraseñas cifradas
+    contraseña = db.Column(db.String(50))
 
 # Modelo Sala
 class Sala(db.Model):
@@ -104,47 +89,18 @@ class AsistenciaEstudiante(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user = User.query.filter_by(username=username).first() #Error de login
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('index'))
-        flash('Nombre de usuario o contraseña incorrectos')
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
 @app.route('/')
-@login_required
 def index():
     return render_template('index.html')
 
-@app.route('/admin')
-@login_required
-def admin():
-    if not current_user.is_admin:
-        abort(403)
-    return "Bienvenido, Admin!"
-
 # Rutas y lógica para CRUD de cada modelo
-
 # DOCENTE CRUD
 @app.route('/docentes')
-@login_required
 def docentes():
     docentes = DOCENTE.query.all()
     return render_template('docentes.html', docentes=docentes)
 
 @app.route('/docente', methods=['POST'])
-@login_required
 def create_docente():
     rut_docente = request.form['rut_docente']
     nombre = request.form['nombre']
@@ -161,7 +117,7 @@ def create_docente():
         apellido_materno=apellido_materno,
         telefono=telefono,
         correo=correo,
-        contraseña=generate_password_hash(contraseña)
+        contraseña=contraseña
     )
     
     db.session.add(nuevo_docente)
@@ -169,7 +125,6 @@ def create_docente():
     return redirect(url_for('docentes'))
 
 @app.route('/docente/<int:id_docente>/delete', methods=['POST'])
-@login_required
 def delete_docente(id_docente):
     docente = DOCENTE.query.get_or_404(id_docente)
     db.session.delete(docente)
@@ -177,13 +132,11 @@ def delete_docente(id_docente):
     return redirect(url_for('docentes'))
 
 @app.route('/docente/<int:id_docente>/edit', methods=['GET'])
-@login_required
 def edit_docente(id_docente):
     docente = DOCENTE.query.get_or_404(id_docente)
     return render_template('edit_docente.html', docente=docente)
 
 @app.route('/docente/<int:id_docente>/edit', methods=['POST'])
-@login_required
 def update_docente(id_docente):
     docente = DOCENTE.query.get_or_404(id_docente)
     docente.rut_docente = request.form['rut_docente']
@@ -192,20 +145,18 @@ def update_docente(id_docente):
     docente.apellido_materno = request.form['apellido_materno']
     docente.telefono = request.form.get('telefono')
     docente.correo = request.form.get('correo')
-    docente.contraseña = generate_password_hash(request.form.get('contraseña'))
+    docente.contraseña = request.form.get('contraseña')
     
     db.session.commit()
     return redirect(url_for('docentes'))
 
 # Sala CRUD
 @app.route('/salas')
-@login_required
 def salas():
     salas = Sala.query.all()
     return render_template('salas.html', salas=salas)
 
 @app.route('/sala', methods=['POST'])
-@login_required
 def create_sala():
     nombre_sala = request.form['nombre_sala']
     nueva_sala = Sala(nombre_sala=nombre_sala)
@@ -214,7 +165,6 @@ def create_sala():
     return redirect(url_for('salas'))
 
 @app.route('/sala/<int:id_sala>/delete', methods=['POST'])
-@login_required
 def delete_sala(id_sala):
     sala = Sala.query.get_or_404(id_sala)
     db.session.delete(sala)
@@ -222,28 +172,26 @@ def delete_sala(id_sala):
     return redirect(url_for('salas'))
 
 @app.route('/sala/<int:id_sala>/edit', methods=['GET'])
-@login_required
 def edit_sala(id_sala):
     sala = Sala.query.get_or_404(id_sala)
     return render_template('edit_sala.html', sala=sala)
 
 @app.route('/sala/<int:id_sala>/edit', methods=['POST'])
-@login_required
 def update_sala(id_sala):
     sala = Sala.query.get_or_404(id_sala)
     sala.nombre_sala = request.form['nombre_sala']
     db.session.commit()
     return redirect(url_for('salas'))
 
-# Taller CRUD
+
+
+#Crud talleres
 @app.route('/talleres')
-@login_required
 def talleres():
     talleres = Taller.query.all()
     return render_template('talleres.html', talleres=talleres)
 
 @app.route('/taller', methods=['POST'])
-@login_required
 def create_taller():
     nombre = request.form['nombre']
     horario = request.form['horario']
@@ -262,15 +210,12 @@ def create_taller():
     return redirect(url_for('talleres'))
 
 @app.route('/taller/<int:taller_id>/delete', methods=['POST'])
-@login_required
 def delete_taller(taller_id):
     taller = Taller.query.get_or_404(taller_id)
     db.session.delete(taller)
     db.session.commit()
     return redirect(url_for('talleres'))
-
 @app.route('/taller/<int:taller_id>/edit', methods=['GET'])
-@login_required
 def edit_taller(taller_id):
     taller = Taller.query.get_or_404(taller_id)
     docentes = DOCENTE.query.all()
@@ -278,7 +223,6 @@ def edit_taller(taller_id):
     return render_template('edit_taller.html', taller=taller, docentes=docentes, salas=salas)
 
 @app.route('/taller/<int:taller_id>/edit', methods=['POST'])
-@login_required
 def update_taller(taller_id):
     taller = Taller.query.get_or_404(taller_id)
     taller.nombre = request.form['nombre']
@@ -289,8 +233,8 @@ def update_taller(taller_id):
     db.session.commit()
     return redirect(url_for('talleres'))
 
+
 @app.route('/taller/new')
-@login_required
 def new_taller():
     docentes = DOCENTE.query.all()
     salas = Sala.query.all()
@@ -298,14 +242,12 @@ def new_taller():
 
 # Clase CRUD
 @app.route('/clases')
-@login_required
 def clases():
     clases = Clase.query.all()
     talleres = Taller.query.all()
     return render_template('clases.html', clases=clases, talleres=talleres)
 
 @app.route('/clase', methods=['POST'])
-@login_required
 def create_clase():
     taller_id = request.form['taller_id']
     fecha = request.form['fecha']
@@ -322,7 +264,6 @@ def create_clase():
     return redirect(url_for('clases'))
 
 @app.route('/clase/<int:id_clase>/delete', methods=['POST'])
-@login_required
 def delete_clase(id_clase):
     clase = Clase.query.get_or_404(id_clase)
     db.session.delete(clase)
@@ -330,13 +271,11 @@ def delete_clase(id_clase):
     return redirect(url_for('clases'))
 
 @app.route('/clase/<int:id_clase>/edit', methods=['GET'])
-@login_required
 def edit_clase(id_clase):
     clase = Clase.query.get_or_404(id_clase)
     return render_template('edit_clase.html', clase=clase)
 
 @app.route('/clase/<int:id_clase>/edit', methods=['POST'])
-@login_required
 def update_clase(id_clase):
     clase = Clase.query.get_or_404(id_clase)
     clase.taller_id = request.form['taller_id']
@@ -348,13 +287,11 @@ def update_clase(id_clase):
 
 # Estudiantes CRUD
 @app.route('/estudiantes')
-@login_required
 def estudiantes():
     estudiantes = Estudiantes.query.all()
     return render_template('estudiantes.html', estudiantes=estudiantes)
 
 @app.route('/estudiante', methods=['POST'])
-@login_required
 def create_estudiante():
     rut_estudiante = request.form['rut_estudiante']
     nombre = request.form['nombre']
@@ -377,7 +314,6 @@ def create_estudiante():
     return redirect(url_for('estudiantes'))
 
 @app.route('/estudiante/<int:id_estudiante>/delete', methods=['POST'])
-@login_required
 def delete_estudiante(id_estudiante):
     estudiante = Estudiantes.query.get_or_404(id_estudiante)
     db.session.delete(estudiante)
@@ -385,13 +321,11 @@ def delete_estudiante(id_estudiante):
     return redirect(url_for('estudiantes'))
 
 @app.route('/estudiante/<int:id_estudiante>/edit', methods=['GET'])
-@login_required
 def edit_estudiante(id_estudiante):
     estudiante = Estudiantes.query.get_or_404(id_estudiante)
     return render_template('edit_estudiante.html', estudiante=estudiante)
 
 @app.route('/estudiante/<int:id_estudiante>/edit', methods=['POST'])
-@login_required
 def update_estudiante(id_estudiante):
     estudiante = Estudiantes.query.get_or_404(id_estudiante)
     estudiante.rut_estudiante = request.form['rut_estudiante']
@@ -406,7 +340,6 @@ def update_estudiante(id_estudiante):
 
 # EstudianteTaller CRUD
 @app.route('/estudiantestaller', methods=['GET', 'POST'])
-@login_required
 def estudiante_talleres():
     if request.method == 'POST':
         taller_id = request.form['taller_id']
@@ -421,7 +354,6 @@ def estudiante_talleres():
     return render_template('estudiantestaller.html', estudiante_talleres=estudiante_talleres, talleres=talleres)
 
 @app.route('/estudiantetaller', methods=['POST'])
-@login_required
 def create_estudiante_taller():
     taller_id = request.form['taller_id']
     id_estudiantes = request.form.getlist('id_estudiantes')
@@ -437,7 +369,6 @@ def create_estudiante_taller():
     return redirect(url_for('estudiante_talleres'))
 
 @app.route('/estudiantetaller/<int:id_taller_estudiante>/delete', methods=['POST'])
-@login_required
 def delete_estudiante_taller(id_taller_estudiante):
     estudiante_taller = EstudianteTaller.query.get_or_404(id_taller_estudiante)
     db.session.delete(estudiante_taller)
@@ -445,7 +376,6 @@ def delete_estudiante_taller(id_taller_estudiante):
     return redirect(url_for('estudiante_talleres'))
 
 @app.route('/estudiantetaller/new')
-@login_required
 def new_estudiante_taller():
     estudiantes = Estudiantes.query.all()
     talleres = Taller.query.all()
@@ -453,9 +383,11 @@ def new_estudiante_taller():
     cursos = [curso[0] for curso in cursos]
     return render_template('create_estudiante_taller.html', estudiantes=estudiantes, talleres=talleres, cursos=cursos)
 
+
+
+
 # AsistenciaEstudiante CRUD
 @app.route('/asistencia/select_clase', methods=['GET', 'POST'])
-@login_required
 def select_clase():
     if request.method == 'POST':
         id_clase = request.form['id_clase']
@@ -464,7 +396,6 @@ def select_clase():
     return render_template('select_clase.html', clases=clases)
 
 @app.route('/asistencia/<int:id_clase>', methods=['GET', 'POST'])
-@login_required
 def take_attendance(id_clase):
     clase = Clase.query.get_or_404(id_clase)
     estudiantes_taller = EstudianteTaller.query.filter_by(taller_id=clase.taller_id).all()
@@ -494,7 +425,6 @@ def take_attendance(id_clase):
     return render_template('take_attendance.html', clase=clase, estudiantes=estudiantes, asistencias=asistencias)
 
 @app.route('/attendance_report')
-@login_required
 def attendance_report():
     talleres = Taller.query.all()
     report_data = []
@@ -522,7 +452,6 @@ def attendance_report():
     return render_template('attendance_report.html', report_data=report_data)
 
 @app.route('/attendance_details/<int:id_clase>')
-@login_required
 def attendance_details(id_clase):
     clase = Clase.query.get_or_404(id_clase)
     asistencias = AsistenciaEstudiante.query.filter_by(id_clase=id_clase).all()
@@ -531,13 +460,11 @@ def attendance_details(id_clase):
 
 # Bitacoras
 @app.route('/taller_bitacoras')
-@login_required
 def taller_bitacoras():
     talleres = Taller.query.all()
     return render_template('taller_bitacoras.html', talleres=talleres)
 
 @app.route('/taller_bitacoras/<int:taller_id>')
-@login_required
 def ver_bitacoras(taller_id):
     taller = Taller.query.get_or_404(taller_id)
     clases = Clase.query.filter_by(taller_id=taller_id).order_by(Clase.fecha).all()
@@ -545,7 +472,6 @@ def ver_bitacoras(taller_id):
 
 # Importar Excel
 @app.route('/cargar_estudiantes', methods=['GET', 'POST'])
-@login_required
 def cargar_estudiantes():
     if request.method == 'POST':
         if 'archivo' not in request.files:

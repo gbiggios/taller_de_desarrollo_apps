@@ -25,7 +25,7 @@
             <div class="form-group">
                 <label for="id_sala">Sala</label>
                 <select class="form-control" id="id_sala" name="id_sala" required>
-                    {% for sala in id_salas %}
+                    {% for sala in salas %}
                         <option value="{{ sala.id_sala }}">{{ sala.id_sala }} - {{ sala.nombre_sala }}</option>
                     {% endfor %}
                 </select>
