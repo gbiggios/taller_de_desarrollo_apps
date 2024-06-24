@@ -3,37 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estudiantes</title>
+    <title>Detalles de Asistencia</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    
     <div class="container mt-5">
-        <h1>Estudiantes</h1>
+        <h1>Detalles de Asistencia - {{ clase.taller.nombre }} - {{ clase.fecha }}</h1>
+        <h2>Estudiantes Ausentes</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>RUT</th>
                     <th>Nombre</th>
                     <th>Apellido Paterno</th>
                     <th>Apellido Materno</th>
-                    <th>Curso</th>
-                    <th>Correo Institucional</th>
                 </tr>
             </thead>
             <tbody>
-                {% for estudiante in estudiantes %}
+                {% for estudiante in estudiantes_ausentes %}
                 <tr>
-                    <td>{{ estudiante.rut_estudiante }}</td>
                     <td>{{ estudiante.nombre }}</td>
                     <td>{{ estudiante.apellido_paterno }}</td>
                     <td>{{ estudiante.apellido_materno }}</td>
-                    <td>{{ estudiante.curso }}</td>
-                    <td>{{ estudiante.correo_institucional }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <a href="{{ url_for('attendance_report') }}" class="btn btn-primary">Volver al Reporte</a>
     </div>
 </body>
 </html>

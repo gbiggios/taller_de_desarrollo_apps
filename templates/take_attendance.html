@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomar Asistencia</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Tomar Asistencia - {{ clase.taller.nombre }} - {{ clase.fecha }}</h1>
+        <form action="{{ url_for('take_attendance', id_clase=clase.id_clase) }}" method="post">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Presente</th>
+                        <th>Justificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for estudiante in estudiantes %}
+                    <tr>
+                        <td>{{ estudiante.nombre }} {{ estudiante.apellido_paterno }} {{ estudiante.apellido_materno }}</td>
+                        <td>
+                            <input type="checkbox" name="presencia_{{ estudiante.id_estudiante }}" value="1" 
+                                id="presencia_{{ estudiante.id_estudiante }}" 
+                                onchange="toggleJustification({{ estudiante.id_estudiante }})" 
+                                {% if estudiante.id_estudiante in asistencias and asistencias[estudiante.id_estudiante].presencia %}checked{% endif %}>
+                        </td>
+                        <td>
+                            <input type="text" name="justificacion_{{ estudiante.id_estudiante }}" class="form-control" 
+                                id="justificacion_{{ estudiante.id_estudiante }}" 
+                                value="{% if estudiante.id_estudiante in asistencias %}{{ asistencias[estudiante.id_estudiante].justificacion }}{% endif %}" 
+                                {% if estudiante.id_estudiante in asistencias and asistencias[estudiante.id_estudiante].presencia %}disabled{% endif %}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Guardar Asistencia</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleJustification(estudianteId) {
+            var presenciaCheckbox = document.getElementById('presencia_' + estudianteId);
+            var justificacionInput = document.getElementById('justificacion_' + estudianteId);
+            if (presenciaCheckbox.checked) {
+                justificacionInput.disabled = true;
+                justificacionInput.value = ''; // Clear the justification if present
+            } else {
+                justificacionInput.disabled = false;
+            }
+        }
+
+        // Initialize the justification inputs based on their initial state
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for estudiante in estudiantes %}
+            toggleJustification({{ estudiante.id_estudiante }});
+            {% endfor %}
+        });
+    </script>
+</body>
+</html>

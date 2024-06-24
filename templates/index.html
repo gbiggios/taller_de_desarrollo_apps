@@ -1,20 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Talleres Catemu</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .nav-link:hover {
+            color: #d4d4d4 !important;
+        }
+        footer {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Gestión de Talleres Catemu</h1>
-    <ul>
-        <li><a href="/docentes">Docentes</a></li>
-        <li><a href="/salas">Salas</a></li>
-        <li><a href="/talleres">Talleres</a></li>
-        <li><a href="/clases">Clases</a></li>
-        <li><a href="/estudiantes">Estudiantes</a></li>
-        <li><a href="/estudiantestaller">Estudiantes en Talleres</a></li>
-        <li><a href="/asistencia_estudiante">Asistencia de Estudiantes</a></li>
-    </ul>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="/">Gestión de Talleres Catemu</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="/docentes">Docentes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/salas">Salas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/talleres">Talleres</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/clases">Clases</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/estudiantes">Estudiantes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/estudiantestaller">Estudiantes en Talleres</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/asistencia/select_clase">Seleccionar Clase para Asistencia</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/attendance_report">Reporte de Asistencia</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/taller_bitacoras">Bitácoras de Talleres</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cargar_estudiantes">Cargar estudiantes</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4">Bienvenido a la Gestión de Talleres Catemu</h1>
+            <p class="lead">Administra fácilmente docentes, salas, talleres, clases y estudiantes. Lleva un registro detallado de la asistencia y genera reportes completos.</p>
+            <hr class="my-4">
+            <p>Utiliza el menú de navegación para acceder a las diferentes secciones del sistema.</p>
+            <a class="btn btn-primary btn-lg" href="/docentes" role="button">Empezar</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="currentYear"></span> Gestión de Talleres Catemu. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>

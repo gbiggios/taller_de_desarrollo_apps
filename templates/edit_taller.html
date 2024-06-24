@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Taller</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Editar Taller</h1>
+        <form action="{{ url_for('update_taller', taller_id=taller.taller_id) }}" method="post">
+            <div class="form-group">
+                <label for="nombre">Nombre del Taller</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" value="{{ taller.nombre }}" required>
+            </div>
+            <div class="form-group">
+                <label for="horario">Horario</label>
+                <input type="text" name="horario" id="horario" class="form-control" value="{{ taller.horario }}" required>
+            </div>
+            <div class="form-group">
+                <label for="id_docente">Docente</label>
+                <select name="id_docente" id="id_docente" class="form-control" required>
+                    {% for docente in docentes %}
+                        <option value="{{ docente.id_docente }}" {% if docente.id_docente == taller.id_docente %}selected{% endif %}>{{ docente.nombre }} {{ docente.apellido_paterno }} {{ docente.apellido_materno }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id_sala">Sala</label>
+                <select name="id_sala" id="id_sala" class="form-control" required>
+                    {% for sala in salas %}
+                        <option value="{{ sala.id_sala }}" {% if sala.id_sala == taller.id_sala %}selected{% endif %}>{{ sala.nombre_sala }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar Taller</button>
+        </form>
+    </div>
+</body>
+</html>
